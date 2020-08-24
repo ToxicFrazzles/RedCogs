@@ -1,0 +1,14 @@
+{
+  "author": ["toxicfrazzles#6982"],
+  "description": "A cog for the Discord bot Red to edit images in various ways",
+  "install_msg": "Thank you for installing this cog. If you fancy contributing head over to https://github.com/ToxicFrazzles/RedCogs/tree/master",
+  "short": "Red cog for image editing...",
+  "end_user_data_statement": "This cog stores no data in the long term. Only storage occurs for the purposes of processing it before the result is sent back.",
+  "min_bot_version": "3.3.10",
+  "min_python_version": [3,8,0],
+  "hidden": false,
+  "disabled": false,
+  "required_cogs": {},
+  "requirements": ["requests","numpy","opencv-python"],
+  "tags": ["image","edit","meme","toxicfrazzles"]
+}
