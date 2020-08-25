@@ -39,6 +39,19 @@ class ImageEdit(commands.Cog):
 				byte_buf = await image_to_bytesio(image)
 				await self.upload_image(ctx.channel, byte_buf)
 
+	@commands.command()
+	async def imagehflip(self, ctx):
+		"""Extract images from a message and send them back but flipped horizontally"""
+		image_urls = await self.extract_image_urls(ctx.message)
+		images = []
+		for url in image_urls:
+			images.append(await image_from_url(self.aiohttp_session, url))
+		async with ctx.typing():
+			for image in images:
+				image = await flip_image(image, 'h')
+				byte_buf = await image_to_bytesio(image)
+				await self.upload_image(ctx.channel, byte_buf)
+
 
 	def cog_unload(self):
 		self.aiohttp_session.close()
