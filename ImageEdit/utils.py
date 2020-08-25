@@ -61,7 +61,7 @@ async def top_caption_image(np_img: np.ndarray, caption):
 	image_height, image_width, image_channels = np_img.shape
 	while True:
 		(text_width, text_height), baseline = cv2.getTextSize(caption, font, font_scale+0.1, int(font_scale)*2)
-		if font_scale+0.1 < max_font_scale and text_width < np_img.shape[1]*0.8:
+		if font_scale+0.1 < max_font_scale and text_width < np_img.shape[1]*0.8 and text_height+baseline < 0.4*image_height:
 			font_scale += 0.1
 		else:
 			(text_width, text_height), baseline = cv2.getTextSize(caption, font, font_scale, int(font_scale)*2)
@@ -82,7 +82,7 @@ async def bottom_caption_image(np_img: np.ndarray, caption):
 	image_height, image_width, image_channels = np_img.shape
 	while True:
 		(text_width, text_height), baseline = cv2.getTextSize(caption, font, font_scale+0.1, int(font_scale)*2)
-		if font_scale+0.1 < max_font_scale and text_width < np_img.shape[1]*0.8:
+		if font_scale+0.1 < max_font_scale and text_width < np_img.shape[1]*0.8 and text_height+baseline < 0.4*image_height:
 			font_scale += 0.1
 		else:
 			(text_width, text_height), baseline = cv2.getTextSize(caption, font, font_scale, int(font_scale)*2)
