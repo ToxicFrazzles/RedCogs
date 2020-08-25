@@ -9,6 +9,6 @@
   "hidden": false,
   "disabled": false,
   "required_cogs": {},
-  "requirements": ["requests","numpy","opencv-python"],
+  "requirements": ["grequests","numpy","opencv-python"],
   "tags": ["image","edit","meme","toxicfrazzles"]
 }
