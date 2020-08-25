@@ -66,6 +66,38 @@ class ImageEdit(commands.Cog):
 				byte_buf = await image_to_bytesio(image)
 				await self.upload_image(ctx.channel, byte_buf)
 
+	@commands.command()
+	async def topcaption(self, ctx, *, message_content: str):
+		image_urls = await self.extract_image_urls(ctx.message)
+		caption = message_content
+		for url in image_urls:
+			caption = caption.replace(url, "")
+		caption = caption.strip()
+		images = []
+		for url in image_urls:
+			images.append(await image_from_url(self.aiohttp_session, url))
+		async with ctx.typing():
+			for image in images:
+				image = await top_caption_image(image, caption)
+				byte_buf = await image_to_bytesio(image)
+				await self.upload_image(ctx.channel, byte_buf)
+
+	@commands.command()
+	async def botcaption(self, ctx, *, message_content: str):
+		image_urls = await self.extract_image_urls(ctx.message)
+		caption = message_content
+		for url in image_urls:
+			caption = caption.replace(url, "")
+		caption = caption.strip()
+		images = []
+		for url in image_urls:
+			images.append(await image_from_url(self.aiohttp_session, url))
+		async with ctx.typing():
+			for image in images:
+				image = await bottom_caption_image(image, caption)
+				byte_buf = await image_to_bytesio(image)
+				await self.upload_image(ctx.channel, byte_buf)
+
 	def cog_unload(self):
 		loop = asyncio.get_running_loop()
 		loop.create_task(self.aiohttp_session.close())
