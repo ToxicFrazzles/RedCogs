@@ -4,6 +4,7 @@ from .utils import *
 import aiohttp
 import io
 import discord
+import asyncio
 
 
 class ImageEdit(commands.Cog):
@@ -66,4 +67,5 @@ class ImageEdit(commands.Cog):
 				await self.upload_image(ctx.channel, byte_buf)
 
 	def cog_unload(self):
-		self.aiohttp_session.close()
+		loop = asyncio.get_running_loop()
+		loop.create_task(self.aiohttp_session.close())
