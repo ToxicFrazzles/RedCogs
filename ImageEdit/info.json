@@ -9,6 +9,6 @@
   "hidden": false,
   "disabled": false,
   "required_cogs": {},
-  "requirements": ["grequests","numpy","opencv-python"],
+  "requirements": ["aiohttp[speedups]","numpy","pillow"],
   "tags": ["image","edit","meme","toxicfrazzles"]
 }
