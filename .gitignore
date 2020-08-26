@@ -129,6 +129,8 @@ dmypy.json
 .pyre/
 
 
+# Red discord bot stuff
+red_setup_logs
 
 # IDE
 .idea
