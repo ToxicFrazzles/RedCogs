@@ -35,7 +35,7 @@ class ImageEdit(commands.Cog):
 	@commands.command()
 	async def imagevflip(self, ctx):
 		"""Extract images from a message and send them back but flipped vertically"""
-		images = self.images_from_message(ctx.message)
+		images = await self.images_from_message(ctx.message)
 		async with ctx.typing():
 			for image in images:
 				image = await flip_image(image, 'v')
@@ -45,7 +45,7 @@ class ImageEdit(commands.Cog):
 	@commands.command()
 	async def imagehflip(self, ctx):
 		"""Extract images from a message and send them back but flipped horizontally"""
-		images = self.images_from_message(ctx.message)
+		images = await self.images_from_message(ctx.message)
 		async with ctx.typing():
 			for image in images:
 				image = await flip_image(image, 'h')
@@ -55,7 +55,7 @@ class ImageEdit(commands.Cog):
 	@commands.command()
 	async def jpegify(self, ctx):
 		"""Extract images from the message and \"deep fry\" them before sending them back"""
-		images = self.images_from_message(ctx.message)
+		images = await self.images_from_message(ctx.message)
 		async with ctx.typing():
 			for image in images:
 				image = await jpegify_image(image)
