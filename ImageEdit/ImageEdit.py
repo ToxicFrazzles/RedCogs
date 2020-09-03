@@ -6,10 +6,27 @@ import io
 import discord
 import asyncio
 from PIL import Image
+import requests
+import os
 
 
 class ImageEdit(commands.Cog):
 	"""Image editing cog"""
+	def __init__(self, bot, *args, **kwargs):
+		self.cog_folder = os.path.dirname(os.path.realpath(__file__))
+		self.bot = bot
+		if not os.path.isdir(os.path.join(self.cog_folder, "Fonts")):
+			os.makedirs(os.path.join(self.cog_folder, "Fonts"))
+		font_files = {
+			"NotoColorEmoji.ttf": "https://github.com/googlefonts/noto-emoji/raw/master/fonts/NotoColorEmoji.ttf",
+			"NotoSans-Regular.ttf": "https://github.com/googlefonts/noto-fonts/raw/master/hinted/NotoSans/NotoSans-Regular.ttf"
+		}
+		for filename, url in font_files.items():
+			with requests.get(url) as r, open(os.path.join(self.cog_folder, "Fonts", filename), "wb") as f:
+				f.write(r.content)
+
+		super().__init__(*args, **kwargs)
+
 	aiohttp_session = aiohttp.ClientSession()
 
 	async def extract_image_urls(self, message):
@@ -74,7 +91,7 @@ class ImageEdit(commands.Cog):
 		images = [await image_from_url(self.aiohttp_session, url) for url in image_urls]
 		async with ctx.typing():
 			for image in images:
-				image = await top_caption_image(image, caption)
+				image = await caption_image(image, caption, caption_type="top")
 				byte_buf = await encode_img(image)
 				await self.upload_image(ctx.channel, byte_buf)
 
@@ -88,7 +105,7 @@ class ImageEdit(commands.Cog):
 		images = [await image_from_url(self.aiohttp_session, url) for url in image_urls]
 		async with ctx.typing():
 			for image in images:
-				image = await bottom_caption_image(image, caption)
+				image = await caption_image(image, caption, caption_type="bottom")
 				byte_buf = await encode_img(image)
 				await self.upload_image(ctx.channel, byte_buf)
 

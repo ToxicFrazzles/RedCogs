@@ -134,3 +134,6 @@ red_setup_logs
 
 # IDE
 .idea
+
+# Proprietary font file
+ImageEdit/Fonts

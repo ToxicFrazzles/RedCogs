@@ -9,6 +9,6 @@
   "hidden": false,
   "disabled": false,
   "required_cogs": {},
-  "requirements": ["aiohttp[speedups]","numpy","pillow"],
-  "tags": ["image","edit","meme","toxicfrazzles"]
+  "requirements": ["aiohttp[speedups]", "requests", "numpy", "pillow"],
+  "tags": ["image", "edit", "meme", "toxicfrazzles"]
 }

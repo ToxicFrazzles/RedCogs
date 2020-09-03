@@ -2,7 +2,8 @@ import aiohttp
 import cv2
 import numpy as np
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw
+import os
 
 
 async def url_is_image(session: aiohttp.ClientSession, url: str) -> bool:
@@ -68,43 +69,32 @@ async def decode_img(byte_buf: BytesIO) -> Image.Image:
 	return pil_img
 
 
-async def top_caption_image(np_img: np.ndarray, caption):
-	font = cv2.FONT_HERSHEY_DUPLEX
-	min_font_scale = 1
-	max_font_scale = 100
-	font_scale = 1
-	image_height, image_width, image_channels = np_img.shape
-	while True:
-		(text_width, text_height), baseline = cv2.getTextSize(caption, font, font_scale+0.1, int(font_scale)*2)
-		if font_scale+0.1 < max_font_scale and text_width < np_img.shape[1]*0.8 and text_height+baseline < 0.4*image_height:
-			font_scale += 0.1
-		else:
-			(text_width, text_height), baseline = cv2.getTextSize(caption, font, font_scale, int(font_scale)*2)
-			break
-	new_height = text_height+baseline+image_height
-	new_img = np.zeros([new_height, image_width, image_channels])
-	new_img[text_height+baseline:, :] = np_img[:, :]
-	new_img = cv2.putText(new_img, caption, ((image_width-text_width)//2, text_height), font, font_scale, (255,255,255), int(font_scale)*2)
-	print(f"Scale: {font_scale}, thickness: {int(font_scale)*2}")
-	return new_img
+async def caption_image(pil_img: Image.Image, caption: str, caption_type="top") -> Image.Image:
+	# Set up some values for easy usage
+	main_font_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Fonts", "NotoSans-Regular.ttf")
+	emoji_font_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Fonts", "NotoColorEmoji.ttf")
+	fontsize = 10
+	image_width, image_height = pil_img.size
 
-
-async def bottom_caption_image(np_img: np.ndarray, caption):
-	font = cv2.FONT_HERSHEY_DUPLEX
-	min_font_scale = 1
-	max_font_scale = 100
-	font_scale = 1
-	image_height, image_width, image_channels = np_img.shape
+	# "Calculate" the ideal text size to fit the width of the image
+	main_font = ImageFont.truetype(main_font_file, size=fontsize)
+	emoji_font = ImageFont.truetype(emoji_font_file, size=109)		# NotoEmojiColor only supports point size 109
 	while True:
-		(text_width, text_height), baseline = cv2.getTextSize(caption, font, font_scale+0.1, int(font_scale)*2)
-		if font_scale+0.1 < max_font_scale and text_width < np_img.shape[1]*0.8 and text_height+baseline < 0.4*image_height:
-			font_scale += 0.1
-		else:
-			(text_width, text_height), baseline = cv2.getTextSize(caption, font, font_scale, int(font_scale)*2)
+		font_width, font_height = main_font.getsize(caption)
+		if font_width > 0.9*image_width:
 			break
-	new_height = text_height+baseline+image_height
-	new_img = np.zeros([new_height, image_width, image_channels])
-	new_img[:image_height, :] = np_img[:, :]
-	new_img = cv2.putText(new_img, caption, ((image_width-text_width)//2, image_height+text_height), font, font_scale, (255,255,255), int(font_scale)*2)
-	print(f"Scale: {font_scale}, thickness: {int(font_scale)*2}")
-	return new_img
+		fontsize += 1
+		main_font = ImageFont.truetype(main_font_file, size=fontsize)
+
+	fontsize -= 1
+	main_font = ImageFont.truetype(main_font_file, size=fontsize)
+	font_width, font_height = main_font.getsize(caption)
+	out_img = Image.new(pil_img.mode, (image_width, image_height+font_height))
+	draw = ImageDraw.Draw(out_img)
+	if caption_type == "top":
+		out_img.paste(pil_img, (0, out_img.size[1]-image_height))
+		draw.text(((image_width-font_width)/2, 0), caption, font=main_font)
+	else:
+		out_img.paste(pil_img)
+		draw.text(((image_width-font_width)/2, image_height), caption, font=main_font)
+	return out_img
