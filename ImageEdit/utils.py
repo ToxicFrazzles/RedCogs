@@ -73,28 +73,34 @@ async def caption_image(pil_img: Image.Image, caption: str, caption_type="top") 
 	# Set up some values for easy usage
 	main_font_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Fonts", "NotoSans-Regular.ttf")
 	emoji_font_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Fonts", "NotoColorEmoji.ttf")
-	fontsize = 10
 	image_width, image_height = pil_img.size
 
 	# "Calculate" the ideal text size to fit the width of the image
-	main_font = ImageFont.truetype(main_font_file, size=fontsize)
+	main_font = ImageFont.truetype(main_font_file, size=109)
 	emoji_font = ImageFont.truetype(emoji_font_file, size=109)		# NotoEmojiColor only supports point size 109
-	while True:
-		font_width, font_height = main_font.getsize(caption)
-		if font_width > 0.9*image_width:
-			break
-		fontsize += 1
-		main_font = ImageFont.truetype(main_font_file, size=fontsize)
 
-	fontsize -= 1
-	main_font = ImageFont.truetype(main_font_file, size=fontsize)
-	font_width, font_height = main_font.getsize(caption)
-	out_img = Image.new(pil_img.mode, (image_width, image_height+font_height))
-	draw = ImageDraw.Draw(out_img)
+	caption_lines = [line.strip() for line in caption.split("\n")]
+	caption_width = 0
+	caption_height = 0
+	for caption_line in caption_lines:
+		width, height = main_font.getsize(caption_line)
+		caption_width = max(caption_width, width)
+		caption_height += height
+	caption_image = Image.new(pil_img.mode, (caption_width, caption_height))
+	draw = ImageDraw.Draw(caption_image)
+	line_height = 0
+	for caption_line in caption_lines:
+		width, height = main_font.getsize(caption_line)
+		draw.text(((caption_width-width)/2, line_height), caption_line, font=main_font)
+		line_height += height
+	caption_height = int((caption_height/caption_width)*image_width)
+	caption_image = caption_image.resize((image_width, caption_height))
+
+	out_img = Image.new(pil_img.mode, (image_width, image_height+caption_height))
 	if caption_type == "top":
+		out_img.paste(caption_image, (0, 0))
 		out_img.paste(pil_img, (0, out_img.size[1]-image_height))
-		draw.text(((image_width-font_width)/2, 0), caption, font=main_font)
 	else:
 		out_img.paste(pil_img)
-		draw.text(((image_width-font_width)/2, image_height), caption, font=main_font)
+		out_img.paste(caption_image, (0, image_height))
 	return out_img
