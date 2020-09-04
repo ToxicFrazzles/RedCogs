@@ -1,6 +1,7 @@
 from redbot.core import commands
 import re
 from .utils import *
+from .caption import caption_image
 import aiohttp
 import io
 import discord

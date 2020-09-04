@@ -1,6 +1,4 @@
 import aiohttp
-import cv2
-import numpy as np
 from io import BytesIO
 from PIL import Image, ImageFont, ImageDraw
 import os
@@ -67,41 +65,3 @@ async def encode_jpg(pil_img: Image.Image, quality=95) -> BytesIO:
 async def decode_img(byte_buf: BytesIO) -> Image.Image:
 	pil_img = Image.open(byte_buf)
 	return pil_img
-
-
-async def caption_image(pil_img: Image.Image, caption: str, caption_type="top") -> Image.Image:
-	# Set up some values for easy usage
-	main_font_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Fonts", "NotoSans-Regular.ttf")
-	emoji_font_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Fonts", "NotoColorEmoji.ttf")
-	image_width, image_height = pil_img.size
-
-	# "Calculate" the ideal text size to fit the width of the image
-	main_font = ImageFont.truetype(main_font_file, size=109)
-	emoji_font = ImageFont.truetype(emoji_font_file, size=109)		# NotoEmojiColor only supports point size 109
-
-	caption_lines = [line.strip() for line in caption.split("\n")]
-	caption_width = 0
-	caption_height = 0
-	for caption_line in caption_lines:
-		width, height = main_font.getsize(caption_line)
-		caption_width = max(caption_width, width)
-		caption_height += height
-	caption_width = int(1.2*caption_width)
-	caption_image = Image.new(pil_img.mode, (caption_width, caption_height))
-	draw = ImageDraw.Draw(caption_image)
-	line_height = 0
-	for caption_line in caption_lines:
-		width, height = main_font.getsize(caption_line)
-		draw.text(((caption_width-width)/2, line_height), caption_line, font=main_font, fill="#FFFFFF", stroke_fill="#000000", stroke_width=5)
-		line_height += height
-	caption_height = int((caption_height/caption_width)*image_width)
-	caption_image = caption_image.resize((image_width, caption_height))
-
-	out_img = Image.new(pil_img.mode, (image_width, image_height+caption_height))
-	if caption_type == "top":
-		out_img.paste(caption_image, (0, 0))
-		out_img.paste(pil_img, (0, out_img.size[1]-image_height))
-	else:
-		out_img.paste(pil_img)
-		out_img.paste(caption_image, (0, image_height))
-	return out_img
