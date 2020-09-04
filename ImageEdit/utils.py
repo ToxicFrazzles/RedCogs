@@ -86,12 +86,13 @@ async def caption_image(pil_img: Image.Image, caption: str, caption_type="top") 
 		width, height = main_font.getsize(caption_line)
 		caption_width = max(caption_width, width)
 		caption_height += height
+	caption_width = int(1.2*caption_width)
 	caption_image = Image.new(pil_img.mode, (caption_width, caption_height))
 	draw = ImageDraw.Draw(caption_image)
 	line_height = 0
 	for caption_line in caption_lines:
 		width, height = main_font.getsize(caption_line)
-		draw.text(((caption_width-width)/2, line_height), caption_line, font=main_font)
+		draw.text(((caption_width-width)/2, line_height), caption_line, font=main_font, fill="#FFFFFF", stroke_fill="#000000", stroke_width=5)
 		line_height += height
 	caption_height = int((caption_height/caption_width)*image_width)
 	caption_image = caption_image.resize((image_width, caption_height))
